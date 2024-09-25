@@ -23,27 +23,8 @@ body, html {
 	font-size: 20px;
 }
 
-.commands {
-	/*color : white;*/
-	/*display: grid;*/
-	/*grid-template-columns: 1fr 3fr repeat(7, 1fr);*/
-	/*width: 85%;*/
-	/*gap: 8px;*/
-}
 .commands label {
 	text-align: end;
-}
-#file {
-	display: none;
-}
-#file-btn {
-	text-align: center;
-	border: solid 1px white;
-	padding: 2px;
-	width: 145px;
-}
-#file-btn:hover {
-	color: #c0c0c0;
 }
 
 table {

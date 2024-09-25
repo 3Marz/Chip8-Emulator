@@ -1,10 +1,16 @@
+
 let run = false;
 
-let runButton = document.getElementById("run");
-let resetButton = document.getElementById("reset");
-let stepButton = document.getElementById("step");
+const screen = document.getElementById("screen")
 
-let romSelecter = document.getElementById("rom-selecter")
+const runButton = document.getElementById("run");
+const resetButton = document.getElementById("reset");
+const stepButton = document.getElementById("step");
+
+const romSelecter = document.getElementById("rom-selecter")
+
+const inputRom = document.getElementById("input-rom")
+const dropArea = document.getElementById("drop-area")
 
 stepButton.onclick = () => {
 	updateDebug();
@@ -12,13 +18,15 @@ stepButton.onclick = () => {
 	CHIP8.step();
 }
 
-runButton.onclick = () => {
-	if(run)
-		runButton.innerHTML = "Run";
-	else
-		runButton.innerHTML = "Pause"
+function toggleRun() {
 	run = !run;
+	if(run)
+		runButton.innerHTML = "Pause";
+	else
+		runButton.innerHTML = "Run"
 }
+
+runButton.onclick = toggleRun
 
 resetButton.onclick = () => {
 	CHIP8.reset()
@@ -27,8 +35,8 @@ resetButton.onclick = () => {
 addEventListener("resize", () => {
 	let factor = Math.floor(window.innerWidth/80)
 	if (factor > 18) { factor = 18 }
-	document.getElementById('screen').style.width = (64*factor) + "px" 
-	document.getElementById('screen').style.height = (32*factor) + "px" 
+	screen.style.width = (64*factor) + "px" 
+	screen.style.height = (32*factor) + "px" 
 })
 
 function getControls(rom){
@@ -55,14 +63,44 @@ function getControls(rom){
 // Load a chip8 rom file
 async function loadRom(rom) {
 	romSelecter.innerHTML = rom;
+	document.getElementById("dropRomMenu").blur()
+	document.getElementById("controllerTooltip").setAttribute("data-tip", getControls(rom))
 	const res = await fetch('../roms/'+rom+'.ch8');
 	const arrayBuffer = await res.arrayBuffer();
 	const unit8 = new Uint8Array(arrayBuffer)
 	CHIP8.reset()
 	CHIP8.load(unit8);
-	if (run == false) { run = true; }
-	document.getElementById("dropRomMenu").blur()
-	document.getElementById("controllerTooltip").setAttribute("data-tip", getControls(rom))
+	if (run == false) { toggleRun() }
+}
+
+function loadCustom() {
+	let fileBlob = inputRom.files[0];
+	let reader = new FileReader();
+	reader.readAsArrayBuffer(fileBlob);
+	reader.onload = (evt) => {
+		const unit8 = new Uint8Array(evt.target.result);
+		CHIP8.reset()
+		CHIP8.load(unit8);
+	}
+	document.getElementById("closeCustom").click()
+	romSelecter.innerHTML = fileBlob.name;
+	document.getElementById("controllerTooltip").setAttribute("data-tip", getControls("Custom"))
+	if (run == false) { toggleRun() }
+}
+
+inputRom.addEventListener("change", loadCustom)
+dropArea.addEventListener("dragover", (e) =>{
+	e.preventDefault();
+})
+dropArea.addEventListener("drop", (e) =>{
+	e.preventDefault();
+	inputRom.files = e.dataTransfer.files;
+	loadCustom()
+})
+
+
+function showCustom() {
+	document.getElementById("rom-modal").showModal()
 }
 
 function update()
