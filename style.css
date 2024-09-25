@@ -3,28 +3,11 @@
 @tailwind utilities;
 
 body, html {
-	margin: 0;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	flex-direction: column;
-	gap: 5px;
-	font-family: monospace;
 	font-size: 20px;
 }
 
 #screen {
 	image-rendering: pixelated;
-}
-
-.header {
-	color: #fefefe;
-	line-height: 20px;
-	font-size: 20px;
-}
-
-.commands label {
-	text-align: end;
 }
 
 table {
