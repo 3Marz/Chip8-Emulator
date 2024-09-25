@@ -65,7 +65,7 @@ async function loadRom(rom) {
 	romSelecter.innerHTML = rom;
 	document.getElementById("dropRomMenu").blur()
 	document.getElementById("controllerTooltip").setAttribute("data-tip", getControls(rom))
-	const res = await fetch('../public/roms/'+rom+'.ch8');
+	const res = await fetch('../roms/'+rom+'.ch8');
 	const arrayBuffer = await res.arrayBuffer();
 	const unit8 = new Uint8Array(arrayBuffer)
 	CHIP8.reset()
