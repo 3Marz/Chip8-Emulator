@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en" class="">
+<head>
+	<meta charset="UTF-8">
+	<link rel="stylesheet" href="./style.css">
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
+	<script src="src/config.js"></script>
+	<title>Chip-8</title>
+</head>
+
+	<body class="">
+		<div>
+			<pre class="text-[10px]/[12px] font-extrabold sm:text-xs/3 md:text-sm/4 lg:text-lg/5">                           
+     ________  __________  ____     ______                __      __            
+    / ____/ / / /  _/ __ \( __ )   / ____/___ ___  __  __/ /___ _/ /_____  _____
+   / /   / /_/ // // /_/ / __  |  / __/ / __ `__ \/ / / / / __ `/ __/ __ \/ ___/
+  / /___/ __  // // ____/ /_/ /  / /___/ / / / / / /_/ / / /_/ / /_/ /_/ / /    
+  \____/_/ /_/___/_/    \____/  /_____/_/ /_/ /_/\__,_/_/\__,_/\__/\____/_/     
+                                                                              
+			</pre>
+		</div>
+
+		<div class="flex flex-col justify-center text-center place-items-center space-y-6">
+			<canvas class="border border-base-300 rounded-lg bg-base-300" id="screen" width="64" height="32"></canvas>
+
+			<div class="flex flex-col-reverse sm:flex-row w-full justify-between text-center place-items-center">
+				<div class="space-x-0">
+					<div  class="dropdown">
+						<div tabindex="0" role="button" class="btn btn-secondary min-w-40" id="rom-selecter">Choose a Rom</div>
+						<ul id="dropRomMenu" tabindex="0" class="dropdown-content menu bg-base-300 p-0 rounded-lg z-10">
+							<li><a onclick="loadRom('Tetris')">Tetris</a></li>
+							<li><a onclick="loadRom('Snake')">Snake</a></li>
+							<li><a onclick="loadRom('Space Invaders')">Space Invader</a></li>
+							<li><a onclick="loadRom('Brick')">Brick</a></li>
+							<li><a onclick="loadRom('Pong')">Pong</a></li>
+							<li><a onclick="loadRom('Cave')">Cave</a></li>
+							<li><a onclick="loadRom('Blinky')">Blinky</a></li>
+						</ul>
+					</div>
+					<div id="controllerTooltip" class="tooltip" data-tip="Controls">
+						 <span class="material-icons flex place-items-center justify-center align-middle cursor-help p-2 bg-secondary text-secondary-content rounded-md">sports_esports</span>
+					</div>
+				</div>
+				
+
+				<!--<div>-->
+				<!--	<label for="steps">Steps:</label>-->
+				<!--	<input type="range" min="1" max="60" value="10" id="steps" class="range max-w-20">-->
+				<!--</div>-->
+
+				<div class="bg-base-200 rounded-md p-0">
+					<label for="debug-checkbox" class="btn btn-ghost">
+						Debug:
+						<input id="debug-checkbox" type="checkbox" class="checkbox checkbox-sm align-middle">
+					</label>
+				</div>
+
+				<div class="bg-primary flex rounded-md">
+					<button class="btn btn-primary p-2" id="reset">Reset</button>
+					<button class="btn btn-primary p-2" id="run">Run</button>
+					<button class="btn btn-primary p-2" id="step">Step</button>
+				</div>
+			</div>
+		</div>
+
+		<br>
+		<div class="debug-container" hidden>
+			<table class="">
+				<tr>
+					<td>PC:</td>
+					<td id="PC">0x000</td>
+					<td>I:</td>
+					<td id="I">0x000</td>
+					<td>DT:</td>
+					<td id="DT">0x000</td>
+					<td>SP:</td>
+					<td id="SP">0x000</td>
+					<td>OC:</td>
+					<td id="OC">0x0000</td>
+				</tr>
+				<tr>
+					<td>V0:</td>
+					<td id="V0">0x000</td>
+				</tr>
+				<tr>
+					<td>V1:</td>
+					<td id="V1">0x000</td>
+					<td>V2:</td>
+					<td id="V2">0x000</td>
+					<td>V3:</td>
+					<td id="V3">0x000</td>
+					<td>V4:</td>
+					<td id="V4">0x000</td>
+					<td>V5:</td>
+					<td id="V5">0x0000</td>
+				</tr>
+				<tr>
+					<td>V6:</td>
+					<td id="V6">0x000</td>
+					<td>V7:</td>
+					<td id="V7">0x000</td>
+					<td>V8:</td>
+					<td id="V8">0x000</td>
+					<td>V9:</td>
+					<td id="V9">0x000</td>
+					<td>VA:</td>
+					<td id="VA">0x0000</td>
+				</tr>
+				<tr>
+					<td>VB:</td>
+					<td id="VB">0x000</td>
+					<td>VC:</td>
+					<td id="VC">0x000</td>
+					<td>VD:</td>
+					<td id="VD">0x000</td>
+					<td>VE:</td>
+					<td id="VE">0x000</td>
+					<td>VF:</td>
+					<td id="VF">0x0000</td>
+				</tr>
+			</table>
+		</div>
+		<div class="stack-container">
+			<p id="stack" hidden></p>
+		</div>
+
+		<div class="prose sm:prose-sm md:prose-base lg:prose-lg space-y-16 flex flex-col mx-24 justify-center place-items-center align-middle text-center mt-10">
+			<div class="space-y-4">
+				<h1 class="text-3xl font-bold">What is Chip-8 ?</h1>
+				<p>CHIP-8 is an interpreted programming language, developed by Joseph Weisbecker, It was initially used on the COSMAC VIP and Telmac 1800, which were 8-bit microcomputers made in the mid-1970s. <a class="link link-info" href="https://en.wikipedia.org/wiki/CHIP-8">See more on wikipedia</a></p>
+			</div>
+			
+			<div class="space-y-4">
+				<h1 class="text-3xl font-bold">Controls</h1>
+				<p>The COSMAC VIP had a hex keyboard for input, which had 16 keys spanning the hex digits 0 to F, which will be mapped to a modern keyboard with the layout below.</p>
+
+				<div class="flex justify-center place-items-center space-x-4">
+					<pre class="text-current">
++---+---+---+---+
+| 1 | 2 | 3 | C |
++---+---+---+---+
+| 4 | 5 | 6 | D |
++---+---+---+---+
+| 7 | 8 | 9 | E |
++---+---+---+---+
+| A | 0 | B | F |
++---+---+---+---+
+COSMAC VIP keyboard</pre>
+					<div>
+						-->
+					</div>
+					<pre class="text-current">
++---+---+---+---+
+| 1 | 2 | 3 | 4 |
++---+---+---+---+
+| Q | W | E | R |
++---+---+---+---+
+| A | S | D | F |
++---+---+---+---+
+| Z | X | C | V |
++---+---+---+---+
+Modern keyboard</pre>
+				</div>
+			</div>
+
+				
+
+		</div>
+
+		<script src="src/debug.js"></script>
+		<script src="./src/chip8.js"></script>
+		<script src="./src/main.js"></script>
+	</body>
+
+</html>
