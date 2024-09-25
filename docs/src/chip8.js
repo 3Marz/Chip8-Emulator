@@ -46,7 +46,7 @@ let CHIP8 = {
 	ctx: null,
 
 	// Audio Object
-	beepSound: new Audio('../public/beep.wav'),
+	beepSound: new Audio('./beep.wav'),
 
 	// Delay and Sound timers 
 	delay_timer: 0,
