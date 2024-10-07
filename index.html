@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="">
+<html lang="en" class="bg-base-300">
 <head>
 	<meta charset="UTF-8">
 	<link rel="stylesheet" href="./style.css">
@@ -9,7 +9,7 @@
 	<title>Chip-8</title>
 </head>
 
-	<body class="m-0 flex justify-center items-center flex-col gap-5 font-mono">
+	<body class="bg-base-100 m-0 flex justify-center items-center flex-col gap-5 font-mono">
 
 		<dialog id="rom-modal" class="modal">
 			<div class="modal-box w-full flex justify-center place-items-center align-middle">
@@ -29,7 +29,7 @@
 		</dialog>
 
 		<div>
-			<pre class="text-[10px]/[12px] font-extrabold sm:text-xs/3 md:text-sm/4 lg:text-lg/5">                           
+			<pre class="text-[10px]/[12px] font-extrabold sm:text-[0.65rem]/3 md:text-[0.75rem]/3 lg:text-[1rem]/5">                           
      ________  __________  ____     ______                __      __            
     / ____/ / / /  _/ __ \( __ )   / ____/___ ___  __  __/ /___ _/ /_____  _____
    / /   / /_/ // // /_/ / __  |  / __/ / __ `__ \/ / / / / __ `/ __/ __ \/ ___/
@@ -183,9 +183,16 @@ Modern keyboard</pre>
 				</div>
 			</div>
 
-				
-
 		</div>
+
+		<footer class="footer footer-center bg-base-300 w-full p-3">
+			<nav class="">
+				<a href="https://github.com/3Marz/Chip8-Emulator" class="link link-hover flex justify-center items-center gap-3">
+					<img src="public/github-mark-white.svg" class="size-10"/>
+					Repo
+				</a>
+			</nav>
+		</footer>
 
 		<script src="./src/debug.js"></script>
 		<script src="./src/chip8.js"></script>
