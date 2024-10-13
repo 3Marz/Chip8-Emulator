@@ -1,12 +1,12 @@
 
-let stepsPerSec = 10;
+const stepsPerSec = 10;
 
-let bgColor = {
+const bgColor = {
 	r: 23,
 	g: 14,
 	b: 22,
 }
-let fgColor = {
+const fgColor = {
 	r: 219,
 	g: 146,
 	b: 75,

@@ -1,3 +1,5 @@
+import { CHIP8 } from "./chip8";
+import { debugCheck, updateDebug } from "./debug";
 
 let run = false;
 
@@ -72,6 +74,7 @@ async function loadRom(rom) {
 	CHIP8.load(unit8);
 	if (run == false) { toggleRun() }
 }
+window.loadRom = loadRom
 
 function loadCustom() {
 	let fileBlob = inputRom.files[0];
@@ -112,13 +115,14 @@ function update()
 		for(let i = 0; i < stepsPerSec; i++){
 			CHIP8.step()	
 			if(debugCheck.checked)
-				updateDebug()
+				updateDebug(CHIP8)
 		};
 		
 		CHIP8.update_timers()
 
 	}
 }
+window.showCustom = showCustom
 
 update();
 
