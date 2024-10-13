@@ -1,5 +1,6 @@
 import { CHIP8 } from "./chip8";
 import { debugCheck, updateDebug } from "./debug";
+import { stepsPerSec } from "./config";
 
 let run = false;
 

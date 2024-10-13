@@ -1,3 +1,4 @@
+import { fgColor, bgColor } from "./config";
 
 // Setting up the canvas
 const cvs = document.getElementById("screen");
