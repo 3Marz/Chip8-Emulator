@@ -14,7 +14,7 @@ function getRandomIntInclusive(min, max) {
 
 let keys = {}
 
-let CHIP8 = {
+export const CHIP8 = {
 
 	// Memory = 4096 byte
 	memory: [],
@@ -75,36 +75,36 @@ let CHIP8 = {
 
 	reset: function () 
 	{
-		CHIP8.pc = 0x200;
-		CHIP8.sp = 0;
-		CHIP8.opcode = 0x0000;
-		CHIP8.i = 0;
-		CHIP8.delay_timer = 0;
-		CHIP8.sound_timer = 0;
+		this.pc = 0x200;
+		this.sp = 0;
+		this.opcode = 0x0000;
+		this.i = 0;
+		this.delay_timer = 0;
+		this.sound_timer = 0;
 
 		for(let i = 0; i < 16; i++)
-			CHIP8.stack[i] = 0;
+			this.stack[i] = 0;
 		
-		if(CHIP8.memory.length == 0) {
+		if(this.memory.length == 0) {
 			for(let i = 0; i < 4096; i++)
-				CHIP8.memory[i] = 0;
+				this.memory[i] = 0;
 		}
 
 		for(let i = 0; i < 16; i++)
-			CHIP8.v[i] = 0x00;
+			this.v[i] = 0x00;
 
-		CHIP8.gfx = new Array(64 * 32);
-		for(let i = 0; i < CHIP8.gfx.length; i++)
+		this.gfx = new Array(64 * 32);
+		for(let i = 0; i < this.gfx.length; i++)
 		{
-			CHIP8.gfx[i] = 0;
+			this.gfx[i] = 0;
 		}
-		CHIP8.ctx = cvs.getContext('2d');
-		CHIP8.scrn = CHIP8.ctx.createImageData(64, 32);
-		CHIP8.update_scrn()
+		this.ctx = cvs.getContext('2d');
+		this.scrn = this.ctx.createImageData(64, 32);
+		this.update_scrn()
 
-		for(let i = 0; i < CHIP8.font_set.length; i++)
+		for(let i = 0; i < this.font_set.length; i++)
 		{
-			CHIP8.memory[i] = CHIP8.font_set[i]
+			this.memory[i] = this.font_set[i]
 		}
 	},
 
@@ -113,38 +113,38 @@ let CHIP8 = {
 		// Load a rom file
 		for(let i = 0; i < rom.length; i++)
 		{
-			CHIP8.memory[i + 512] = rom[i]
+			this.memory[i + 512] = rom[i]
 		}
 	},
 
 	update_scrn: function ()
 	{
-		for(let i = 0; i < CHIP8.gfx.length; i++)
+		for(let i = 0; i < this.gfx.length; i++)
 		{
 			let accI = i*4;
-			CHIP8.scrn.data[accI  ] = CHIP8.gfx[i]==1 ? fgColor.r : bgColor.r;
-			CHIP8.scrn.data[accI+1] = CHIP8.gfx[i]==1 ? fgColor.g : bgColor.g;
-			CHIP8.scrn.data[accI+2] = CHIP8.gfx[i]==1 ? fgColor.b : bgColor.b;
-			CHIP8.scrn.data[accI+3] = 255
+			this.scrn.data[accI  ] = this.gfx[i]==1 ? fgColor.r : bgColor.r;
+			this.scrn.data[accI+1] = this.gfx[i]==1 ? fgColor.g : bgColor.g;
+			this.scrn.data[accI+2] = this.gfx[i]==1 ? fgColor.b : bgColor.b;
+			this.scrn.data[accI+3] = 255
 		}
-		CHIP8.ctx.putImageData(CHIP8.scrn,0,0)
+		this.ctx.putImageData(this.scrn,0,0)
 	},
 
 	update_timers: function () 
 	{
-		if(CHIP8.delay_timer > 0)	{
-			CHIP8.delay_timer--;
+		if(this.delay_timer > 0)	{
+			this.delay_timer--;
 		}
-		if(CHIP8.sound_timer > 0) {
-			CHIP8.beepSound.play()
-			CHIP8.sound_timer--;
+		if(this.sound_timer > 0) {
+			this.beepSound.play()
+			this.sound_timer--;
 		}
 	},
 
 	step: function ()
 	{ 
-		CHIP8.opcode = (CHIP8.memory[CHIP8.pc] << 8) | CHIP8.memory[CHIP8.pc+1] 
-		let opcode = CHIP8.opcode;
+		this.opcode = (this.memory[this.pc] << 8) | this.memory[this.pc+1] 
+		let opcode = this.opcode;
 		// console.log((opcode&0xF000).toString(16))
 
 		switch(opcode&0xF000)
@@ -155,51 +155,51 @@ let CHIP8 = {
 				{
 					// CLS
 					case 0x0000:
-						CHIP8.gfx = new Array(64 * 32);
-						CHIP8.update_scrn();
-						CHIP8.pc+= 2
+						this.gfx = new Array(64 * 32);
+						this.update_scrn();
+						this.pc+= 2
 						break;
 
 					// RET
 					case 0x000E:
 						// IDK if it should be deleted
-						CHIP8.pc = CHIP8.stack[CHIP8.sp];
-						CHIP8.stack[CHIP8.sp] = 0
-						if(CHIP8.sp != 0) { CHIP8.sp-- };
+						this.pc = this.stack[this.sp];
+						this.stack[this.sp] = 0
+						if(this.sp != 0) { this.sp-- };
 						break;
 				}
 				break;
 
 			// JP addr
 			case 0x1000:
-				CHIP8.pc = (opcode&0x0FFF);
+				this.pc = (opcode&0x0FFF);
 				break;
 
 			// CALL addr
 			case 0x2000:
-				CHIP8.pc += 2;
-				if(CHIP8.stack[CHIP8.sp] != 0) { CHIP8.sp++ }
-				CHIP8.stack[CHIP8.sp] = CHIP8.pc;
-				CHIP8.pc = (opcode&0x0FFF);
+				this.pc += 2;
+				if(this.stack[this.sp] != 0) { this.sp++ }
+				this.stack[this.sp] = this.pc;
+				this.pc = (opcode&0x0FFF);
 				break;
 
 			// SE Vx, byte
 			case 0x3000:
 				var x = (opcode>>8)&0x000F;
-				if(CHIP8.v[x] == (opcode&0x00FF)){
-					CHIP8.pc += 4;
+				if(this.v[x] == (opcode&0x00FF)){
+					this.pc += 4;
 				}else {
-					CHIP8.pc += 2;
+					this.pc += 2;
 				}
 				break;
 
 			// SNE Vx, byte
 			case 0x4000:
 				var x = (opcode>>8)&0x000F;
-				if(CHIP8.v[x] != (opcode&0x00FF)){
-					CHIP8.pc += 4;
+				if(this.v[x] != (opcode&0x00FF)){
+					this.pc += 4;
 				}else {
-					CHIP8.pc += 2;
+					this.pc += 2;
 				} 
 				break;
 
@@ -207,10 +207,10 @@ let CHIP8 = {
 			case 0x5000:
 				var x = (opcode>>8)&0x000F;
 				var y = (opcode>>4)&0x000F;
-				if(CHIP8.v[x] == CHIP8.v[y]){
-					CHIP8.pc += 4;
+				if(this.v[x] == this.v[y]){
+					this.pc += 4;
 				} else {
-					CHIP8.pc += 2;
+					this.pc += 2;
 				}
 				break;
 
@@ -218,18 +218,18 @@ let CHIP8 = {
 			case 0x6000:
 				var x = (opcode>>8)&0x000F;
 				var byte = opcode&0x00FF;
-				CHIP8.v[x] = byte;
-				CHIP8.pc += 2;
+				this.v[x] = byte;
+				this.pc += 2;
 				break;
 
 			// ADD Vx, byte
 			case 0x7000:
 				var x = (opcode&0x0F00)>>8;
 				var byte = opcode&0x00FF;
-				var res = CHIP8.v[x]+byte
+				var res = this.v[x]+byte
 				if(res > 255) { res -= 256 }
-				CHIP8.v[x] = res;
-				CHIP8.pc += 2;
+				this.v[x] = res;
+				this.pc += 2;
 				break;
 
 			// 8xy(num)
@@ -240,103 +240,103 @@ let CHIP8 = {
 					case 0x8000:
 						var x = (opcode>>8)&0x000F;
 						var y = (opcode>>4)&0x000F;
-						CHIP8.v[x] = CHIP8.v[y];
-						CHIP8.pc += 2;
+						this.v[x] = this.v[y];
+						this.pc += 2;
 						break;
 
 					// OR Vx, Vy
 					case 0x8001:
 						var x = (opcode>>8)&0x000F;
 						var y = (opcode>>4)&0x000F;
-						CHIP8.v[x] |= CHIP8.v[y];
-						CHIP8.pc += 2;
+						this.v[x] |= this.v[y];
+						this.pc += 2;
 						break;
 
 					// AND Vx, Vy
 					case 0x8002:
 						var x = (opcode>>8)&0x000F;
 						var y = (opcode>>4)&0x000F;
-						CHIP8.v[x] &= CHIP8.v[y];
-						CHIP8.pc += 2;
+						this.v[x] &= this.v[y];
+						this.pc += 2;
 						break;
 
 					// XOR Vx, Vy
 					case 0x8003:
 						var x = (opcode>>8)&0x000F;
 						var y = (opcode>>4)&0x000F;
-						CHIP8.v[x] ^= CHIP8.v[y];
-						CHIP8.pc += 2;
+						this.v[x] ^= this.v[y];
+						this.pc += 2;
 						break;
 
 					// ADD Vx, Vy
 					case 0x8004:
 						var x = (opcode>>8)&0x000F;
 						var y = (opcode>>4)&0x000F;
-						var result = CHIP8.v[x] + CHIP8.v[y];
+						var result = this.v[x] + this.v[y];
 						if(result > 255)
 						{
-							CHIP8.v[0xF] = 1;
+							this.v[0xF] = 1;
 						}
 						else
 						{
-							CHIP8.v[0xF] = 0;
+							this.v[0xF] = 0;
 						}
-						CHIP8.v[x] = result&0xFF;
-						CHIP8.pc += 2;
+						this.v[x] = result&0xFF;
+						this.pc += 2;
 						break;
 
 					// SUB Vx, Vy
 					case 0x8005:
 						var x = (opcode>>8)&0x000F;
 						var y = (opcode>>4)&0x000F;
-						if(CHIP8.v[x] >= CHIP8.v[y])
+						if(this.v[x] >= this.v[y])
 						{
-							CHIP8.v[0xF] = 1;
+							this.v[0xF] = 1;
 						}
 						else
 						{
-							CHIP8.v[0xF] = 0;
+							this.v[0xF] = 0;
 						}
-						var res = CHIP8.v[x] - CHIP8.v[y];
+						var res = this.v[x] - this.v[y];
 						if( res < 0 ) { res += 256 }
-						CHIP8.v[x] = res;
-						CHIP8.pc += 2;
+						this.v[x] = res;
+						this.pc += 2;
 						break;
 
 					// SHR Vx, {, Vy}
 					case 0x8006:
 						var x = (opcode>>8)&0x000F;
 						var y = (opcode>>4)&0x000F;
-						CHIP8.v[0xF] = CHIP8.v[y]&0b00000001;
-						CHIP8.v[x] >>>= 1;
-						CHIP8.pc += 2;
+						this.v[0xF] = this.v[y]&0b00000001;
+						this.v[x] >>>= 1;
+						this.pc += 2;
 						break;
 
 					// SUBN Vx, Vy
 					case 0x8007:
 						var x = (opcode>>8)&0x000F;
 						var y = (opcode>>4)&0x000F;
-						if(CHIP8.v[y] >= CHIP8.v[x])
+						if(this.v[y] >= this.v[x])
 						{
-							CHIP8.v[0xF] = 1;
+							this.v[0xF] = 1;
 						}
 						else
 						{
-							CHIP8.v[0xF] = 0;
+							this.v[0xF] = 0;
 						}
-						var res = CHIP8.v[y] - CHIP8.v[x];
+						var res = this.v[y] - this.v[x];
 						if( res < 0 ){ res += 256 }
-						CHIP8.v[x] = res;
-						CHIP8.pc += 2;
+						this.v[x] = res;
+						this.pc += 2;
 						break;
 
 					// SHL Vx, {, Vy}
 					case 0x800E:
 						var x = (opcode>>8)&0x000F;
 						var y = (opcode>>4)&0x000F;
-						CHIP8.v[0xF] = (CHIP8.v[y]>>7);
-						CHIP8.v[x] <<= 1;
-						CHIP8.pc += 2;
+						this.v[0xF] = (this.v[y]>>7);
+						this.v[x] <<= 1;
+						this.pc += 2;
 						break;
 
 
@@ -347,23 +347,23 @@ let CHIP8 = {
 			case 0x9000:
 				var x = (opcode&0x0F00)>>8;
 				var y = (opcode&0x00F0)>>4;
-				if(CHIP8.v[x] != CHIP8.v[y]) {
-					CHIP8.pc += 4;
+				if(this.v[x] != this.v[y]) {
+					this.pc += 4;
 				} else {
-					CHIP8.pc += 2;
+					this.pc += 2;
 				}
 				break;
 
 			// LD I, addr
 			case 0xA000:
-				CHIP8.i = opcode&0x0FFF;
-				CHIP8.pc += 2;
+				this.i = opcode&0x0FFF;
+				this.pc += 2;
 				break;
 
 			// JP V0, addr
 			case 0xB000:
 				var addr = opcode&0x0FFF;
-				CHIP8.pc = addr + CHIP8.v[0];
+				this.pc = addr + this.v[0];
 				break;
 
 			// RND Vx, byte
@@ -371,35 +371,35 @@ let CHIP8 = {
 				var x = (opcode>>8)&0x000F;
 				var rand = getRandomIntInclusive(0, 255);
 				var byte = (opcode)&0x00FF;
-				CHIP8.v[x] = rand&byte;
-				CHIP8.pc += 2;
+				this.v[x] = rand&byte;
+				this.pc += 2;
 				break;
 
 			// DRW Vx, Vy, nibble 
 			case 0xD000:
-				var x = CHIP8.v[(opcode>>8)&0x000F];
-				var y = CHIP8.v[(opcode>>4)&0x000F];
+				var x = this.v[(opcode>>8)&0x000F];
+				var y = this.v[(opcode>>4)&0x000F];
 				var n = opcode&0x000F;
 
-				CHIP8.v[0xF] = 0;
+				this.v[0xF] = 0;
 				for(let i = 0; i < n; i++)
 				{
-					let pixRow = CHIP8.memory[CHIP8.i+i]
+					let pixRow = this.memory[this.i+i]
 					let posY = (y+i)%32;
 					for(let k = 0; k < 8; k++)
 					{
 						let posX = (x+k)%64;
 						if((pixRow&(0x80>>k)) != 0) {
-							if(CHIP8.gfx[posX + (posY * 64)] == 1) {
-								CHIP8.v[0xF] = 1
+							if(this.gfx[posX + (posY * 64)] == 1) {
+								this.v[0xF] = 1
 							}
-							CHIP8.gfx[posX + (posY * 64)] ^= 1
+							this.gfx[posX + (posY * 64)] ^= 1
 						}
 						
 					}
 				}
-				CHIP8.update_scrn();
-				CHIP8.pc += 2;
+				this.update_scrn();
+				this.pc += 2;
 				break;
 
 			// Ex00 (Key Input)
@@ -409,23 +409,23 @@ let CHIP8 = {
 					// SKP Vx
 					case 0x000E:
 						var x = (opcode>>8)&0x000F;
-						if(CHIP8.keys[CHIP8.v[x].toString(16)] == true) {
-							CHIP8.pc += 4;
+						if(this.keys[this.v[x].toString(16)] == true) {
+							this.pc += 4;
 						} 
 						else {
-							CHIP8.pc += 2;
+							this.pc += 2;
 						}
 						break;
 
 					// SKNP Vx
 					case 0x0001:
 						var x = (opcode>>8)&0x000F;
-						// console.log("keyup at: " + CHIP8.v[x].toString(16))
-						if(CHIP8.keys[CHIP8.v[x].toString(16)] == false) {
-							CHIP8.pc += 4;
+						// console.log("keyup at: " + this.v[x].toString(16))
+						if(this.keys[this.v[x].toString(16)] == false) {
+							this.pc += 4;
 						} 
 						else {
-							CHIP8.pc += 2;
+							this.pc += 2;
 						}
 						break;
 
@@ -440,8 +440,8 @@ let CHIP8 = {
 					// LD Vx, DT
 					case 0x0007:
 						var x = (opcode>>8)&0x000F;
-						CHIP8.v[x] = CHIP8.delay_timer;
-						CHIP8.pc += 2;
+						this.v[x] = this.delay_timer;
+						this.pc += 2;
 						break;
 
 					// LD Vx, k (wait for key input)
@@ -452,38 +452,38 @@ let CHIP8 = {
 					// LD DT, Vx
 					case 0x0015:
 						var x = (opcode>>8)&0x000F;
-						CHIP8.delay_timer = CHIP8.v[x];
-						CHIP8.pc += 2;
+						this.delay_timer = this.v[x];
+						this.pc += 2;
 						break;
 						
 					// LD ST, Vx
 					case 0x0018:
 						var x = (opcode>>8)&0x000F;
-						CHIP8.sound_timer = CHIP8.v[x];
-						CHIP8.pc += 2;
+						this.sound_timer = this.v[x];
+						this.pc += 2;
 						break;
 
 					// ADD I, Vx
 					case 0x001E:
 						var x = (opcode>>8)&0x000F;
-						CHIP8.i += CHIP8.v[x];
-						CHIP8.pc += 2;
+						this.i += this.v[x];
+						this.pc += 2;
 						break;
 
 					// LD F, Vx
 					case 0x0029:
 						var x = (opcode>>8)&0x000F;
-						CHIP8.i = (CHIP8.v[x]&0xf)*5;
-						CHIP8.pc += 2
+						this.i = (this.v[x]&0xf)*5;
+						this.pc += 2
 						break;
 
 					// LD B, Vx
 					case 0x0033:
 						var x = (opcode>>8)&0x000F;
-						CHIP8.memory[CHIP8.i  ] = Math.floor(CHIP8.v[x]/100);
-						CHIP8.memory[CHIP8.i+1] = Math.floor((CHIP8.v[x]/10)%10);
-						CHIP8.memory[CHIP8.i+2] = Math.floor((CHIP8.v[x]%100)%10);
-						CHIP8.pc += 2; 
+						this.memory[this.i  ] = Math.floor(this.v[x]/100);
+						this.memory[this.i+1] = Math.floor((this.v[x]/10)%10);
+						this.memory[this.i+2] = Math.floor((this.v[x]%100)%10);
+						this.pc += 2; 
 						break
 
 					// LD [I], Vx
@@ -491,9 +491,9 @@ let CHIP8 = {
 						var x = (opcode>>8)&0x000F;
 						for (let i = 0; i < x+1; i++)
 						{
-							CHIP8.memory[CHIP8.i+i] = CHIP8.v[i];
+							this.memory[this.i+i] = this.v[i];
 						}	
-						CHIP8.pc += 2;
+						this.pc += 2;
 						break;
 
 					// LD Vx, [I]
@@ -501,24 +501,18 @@ let CHIP8 = {
 						var x = (opcode>>8)&0x000F;
 						for (let i = 0; i < x + 1; i++)
 						{
-							CHIP8.v[i] = CHIP8.memory[CHIP8.i+i];
+							this.v[i] = this.memory[this.i+i];
 						}	
-						CHIP8.pc += 2;
+						this.pc += 2;
 						break;
 				}
 				break;
 
 			default:
-				console.log("unimlmanted at opcode:"+CHIP8.opcode.toString(16))
+				console.log("unimlmanted at opcode:"+this.opcode.toString(16))
 				break;
 		}
-
-		
-
-		//console.log(opcode.toString(16))
-
 	},
-
 }
 
 document.addEventListener("keydown", e => {
@@ -563,7 +557,7 @@ document.addEventListener("keydown", e => {
 				key = 0xF; break;
 		}
 		if(key != -1) {
-			CHIP8.v[x] = key//"1".charCodeAt(0);
+			CHIP8.v[x] = key;
 			CHIP8.pc += 2;
 		}
 	} 
