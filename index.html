@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-base-300">
+<head>
+	<meta charset="UTF-8">
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
+	<title>Chip-8</title>
+  <script type="module" crossorigin src="/assets/index-DT8wDJHZ.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-fi6ljHWH.css">
+</head>
+
+	<body class="bg-base-100 m-0 flex justify-center items-center flex-col gap-5 font-mono">
+
+		<dialog id="rom-modal" class="modal">
+			<div class="modal-box w-full flex justify-center place-items-center align-middle">
+				<label class="w-full p-6 border-current border-2 rounded-md" for="input-rom" id="drop-area">
+					<input id="input-rom" type="file" accept=".ch8" hidden>
+					<div class="text-center space-y-16">
+						<h4 class="text-lg font-semibold">Drop Your Rom (.ch8)</h4>
+						<span class="material-icons scale-[4] pb-3">
+						file_upload
+						</span>
+					</div>
+				</label>
+			</div>
+			<form method="dialog" class="modal-backdrop">
+				<button id="closeCustom">close</button>
+			</form>
+		</dialog>
+
+		<div>
+			<pre class="text-[10px]/[12px] font-extrabold sm:text-[0.65rem]/3 md:text-[0.75rem]/3 lg:text-[1rem]/5">                           
+     ________  __________  ____     ______                __      __            
+    / ____/ / / /  _/ __ \( __ )   / ____/___ ___  __  __/ /___ _/ /_____  _____
+   / /   / /_/ // // /_/ / __  |  / __/ / __ `__ \/ / / / / __ `/ __/ __ \/ ___/
+  / /___/ __  // // ____/ /_/ /  / /___/ / / / / / /_/ / / /_/ / /_/ /_/ / /    
+  \____/_/ /_/___/_/    \____/  /_____/_/ /_/ /_/\__,_/_/\__,_/\__/\____/_/     
+                                                                              
+			</pre>
+		</div>
+
+		<div class="flex flex-col justify-center text-center place-items-center space-y-6">
+			<canvas class="border border-base-300 rounded-lg bg-base-300" id="screen" width="64" height="32"></canvas>
+
+			<div class="flex flex-col-reverse sm:flex-row w-full justify-between text-center place-items-center">
+				<div class="space-x-0">
+					<div  class="dropdown">
+						<div tabindex="0" role="button" class="btn btn-secondary min-w-40" id="rom-selecter">Choose a Rom</div>
+						<ul id="dropRomMenu" tabindex="0" class="dropdown-content menu bg-base-300 p-0 rounded-lg z-10">
+							<li><a onclick="loadRom('Tetris')">Tetris</a></li>
+							<li><a onclick="loadRom('Snake')">Snake</a></li>
+							<li><a onclick="loadRom('Space Invaders')">Space Invader</a></li>
+							<li><a onclick="loadRom('Brick')">Brick</a></li>
+							<li><a onclick="loadRom('Pong')">Pong</a></li>
+							<li><a onclick="loadRom('Cave')">Cave</a></li>
+							<li><a onclick="loadRom('Blinky')">Blinky</a></li>
+							<li><a onclick="showCustom()">Custom</a></li>
+						</ul>
+					</div>
+					<div id="controllerTooltip" class="tooltip" data-tip="Controls">
+						 <span class="material-icons flex place-items-center justify-center align-middle cursor-help p-2 bg-secondary text-secondary-content rounded-md">sports_esports</span>
+					</div>
+				</div>
+				
+
+				<!--<div>-->
+				<!--	<label for="steps">Steps:</label>-->
+				<!--	<input type="range" min="1" max="60" value="10" id="steps" class="range max-w-20">-->
+				<!--</div>-->
+
+				<div class="bg-base-200 rounded-md p-0">
+					<label for="debug-checkbox" class="btn btn-ghost">
+						Debug:
+						<input id="debug-checkbox" type="checkbox" class="checkbox checkbox-sm align-middle">
+					</label>
+				</div>
+
+				<div class="bg-primary flex rounded-md">
+					<button class="btn btn-primary p-2" id="reset">Reset</button>
+					<button class="btn btn-primary p-2" id="run">Run</button>
+					<button class="btn btn-primary p-2" id="step">Step</button>
+				</div>
+			</div>
+		</div>
+
+		<br>
+		<div class="debug-container" hidden>
+			<table class="">
+				<tr>
+					<td>PC:</td>
+					<td id="PC">0x000</td>
+					<td>I:</td>
+					<td id="I">0x000</td>
+					<td>DT:</td>
+					<td id="DT">0x000</td>
+					<td>SP:</td>
+					<td id="SP">0x000</td>
+					<td>OC:</td>
+					<td id="OC">0x0000</td>
+				</tr>
+				<tr>
+					<td>V0:</td>
+					<td id="V0">0x000</td>
+				</tr>
+				<tr>
+					<td>V1:</td>
+					<td id="V1">0x000</td>
+					<td>V2:</td>
+					<td id="V2">0x000</td>
+					<td>V3:</td>
+					<td id="V3">0x000</td>
+					<td>V4:</td>
+					<td id="V4">0x000</td>
+					<td>V5:</td>
+					<td id="V5">0x0000</td>
+				</tr>
+				<tr>
+					<td>V6:</td>
+					<td id="V6">0x000</td>
+					<td>V7:</td>
+					<td id="V7">0x000</td>
+					<td>V8:</td>
+					<td id="V8">0x000</td>
+					<td>V9:</td>
+					<td id="V9">0x000</td>
+					<td>VA:</td>
+					<td id="VA">0x0000</td>
+				</tr>
+				<tr>
+					<td>VB:</td>
+					<td id="VB">0x000</td>
+					<td>VC:</td>
+					<td id="VC">0x000</td>
+					<td>VD:</td>
+					<td id="VD">0x000</td>
+					<td>VE:</td>
+					<td id="VE">0x000</td>
+					<td>VF:</td>
+					<td id="VF">0x0000</td>
+				</tr>
+			</table>
+		</div>
+		<div class="stack-container">
+			<p id="stack" hidden></p>
+		</div>
+
+		<div class="prose sm:prose-sm md:prose-base lg:prose-lg space-y-16 flex flex-col mx-24 justify-center place-items-center align-middle text-center mt-10">
+			<div class="space-y-4">
+				<h1 class="text-3xl font-bold">What is Chip-8 ?</h1>
+				<p>CHIP-8 is an interpreted programming language, developed by Joseph Weisbecker, It was initially used on the COSMAC VIP and Telmac 1800, which were 8-bit microcomputers made in the mid-1970s. <a class="link link-info" href="https://en.wikipedia.org/wiki/CHIP-8">See more on wikipedia</a></p>
+			</div>
+			
+			<div class="space-y-4">
+				<h1 class="text-3xl font-bold">Controls</h1>
+				<p>The COSMAC VIP had a hex keyboard for input, which had 16 keys spanning the hex digits 0 to F, which will be mapped to a modern keyboard with the layout below.</p>
+
+				<div class="flex justify-center place-items-center space-x-4">
+					<pre class="text-current">
++---+---+---+---+
+| 1 | 2 | 3 | C |
++---+---+---+---+
+| 4 | 5 | 6 | D |
++---+---+---+---+
+| 7 | 8 | 9 | E |
++---+---+---+---+
+| A | 0 | B | F |
++---+---+---+---+
+COSMAC VIP keyboard</pre>
+					<div>
+						-->
+					</div>
+					<pre class="text-current">
++---+---+---+---+
+| 1 | 2 | 3 | 4 |
++---+---+---+---+
+| Q | W | E | R |
++---+---+---+---+
+| A | S | D | F |
++---+---+---+---+
+| Z | X | C | V |
++---+---+---+---+
+Modern keyboard</pre>
+				</div>
+			</div>
+
+		</div>
+
+		<footer class="footer footer-center bg-base-300 w-full p-3">
+			<nav class="">
+				<a href="https://github.com/3Marz/Chip8-Emulator" class="link link-hover flex justify-center items-center gap-3">
+					<img src="data:image/svg+xml,%3csvg%20width='98'%20height='96'%20xmlns='http://www.w3.org/2000/svg'%3e%3cpath%20fill-rule='evenodd'%20clip-rule='evenodd'%20d='M48.854%200C21.839%200%200%2022%200%2049.217c0%2021.756%2013.993%2040.172%2033.405%2046.69%202.427.49%203.316-1.059%203.316-2.362%200-1.141-.08-5.052-.08-9.127-13.59%202.934-16.42-5.867-16.42-5.867-2.184-5.704-5.42-7.17-5.42-7.17-4.448-3.015.324-3.015.324-3.015%204.934.326%207.523%205.052%207.523%205.052%204.367%207.496%2011.404%205.378%2014.235%204.074.404-3.178%201.699-5.378%203.074-6.6-10.839-1.141-22.243-5.378-22.243-24.283%200-5.378%201.94-9.778%205.014-13.2-.485-1.222-2.184-6.275.486-13.038%200%200%204.125-1.304%2013.426%205.052a46.97%2046.97%200%200%201%2012.214-1.63c4.125%200%208.33.571%2012.213%201.63%209.302-6.356%2013.427-5.052%2013.427-5.052%202.67%206.763.97%2011.816.485%2013.038%203.155%203.422%205.015%207.822%205.015%2013.2%200%2018.905-11.404%2023.06-22.324%2024.283%201.78%201.548%203.316%204.481%203.316%209.126%200%206.6-.08%2011.897-.08%2013.526%200%201.304.89%202.853%203.316%202.364%2019.412-6.52%2033.405-24.935%2033.405-46.691C97.707%2022%2075.788%200%2048.854%200z'%20fill='%23fff'/%3e%3c/svg%3e" class="size-10"/>
+					Repo
+				</a>
+			</nav>
+		</footer>
+
+	</body>
+
+</html>
