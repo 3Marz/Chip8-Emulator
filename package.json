@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-		"deploy": "node deploy.js"
+		"deploy": "node deploy.cjs"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.15",
